@@ -125,6 +125,17 @@ async fn main() {
                             .read_line(&mut input)
                             .expect("Failed to read line");
 
+                        // Add the command to the shell history
+                        if let Some(shell) = env::var_os("SHELL") {
+                            let history_command = format!("history -a && \"{}\" && history -r", command_str);
+                            std::process::Command::new(shell)
+                                .arg("-c")
+                                .arg(&history_command)
+                                .status()
+                                .expect("Failed to add command to history and execute");
+                        }
+
+                        // Execute the command
                         let output = std::process::Command::new("sh")
                             .arg("-c")
                             .arg(command_str)
