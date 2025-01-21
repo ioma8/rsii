@@ -857,16 +857,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "raii"
-version = "0.1.0"
-dependencies = [
- "openai-api-rs",
- "serde_json",
- "tokio",
- "toml",
-]
-
-[[package]]
 name = "rand"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,6 +953,16 @@ dependencies = [
  "spin",
  "untrusted",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "rsii"
+version = "0.1.0"
+dependencies = [
+ "openai-api-rs",
+ "serde_json",
+ "tokio",
+ "toml",
 ]
 
 [[package]]
