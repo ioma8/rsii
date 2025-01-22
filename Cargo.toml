@@ -10,7 +10,7 @@ homepage = "https://github.com/ioma8/rsii"
 documentation = "https://github.com/ioma8/rsii"
 readme = "README.md"
 keywords = ["AI", "OpenAI", "command-line", "assistant", "automation"]
-categories = ["command-line-utilities", "artificial-intelligence"]
+categories = ["command-line-utilities", "command-line-interface"]
 
 [package.metadata]
 installation = """
