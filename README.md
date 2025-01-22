@@ -24,7 +24,7 @@ Ever wanted your terminal to be smarter? RSII uses Rust and OpenAI to turn your 
 
 1. Install RSII using Homebrew:
     ```sh
-    brew tap ioma8/rsii
+    brew tap ioma8/rsii https://github.com/ioma8/homebrew-rsii
     brew install rsii
     ```
 
