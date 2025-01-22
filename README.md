@@ -12,13 +12,25 @@ Ever wanted your terminal to be smarter? RSII uses Rust and OpenAI to turn your 
 
 ## Installation
 
+### Using Cargo
+
 1. Ensure Rust is installed on your system. You can download and install Rust from [rust-lang.org](https://www.rust-lang.org/learn/get-started).
 2. Install the RSII package using Cargo:
     ```sh
     cargo install rsii
     ```
 
-3. Edit a configuration file at `~/.rsii/config.toml`:
+### Using Homebrew
+
+1. Install RSII using Homebrew:
+    ```sh
+    brew tap ioma8/rsii
+    brew install rsii
+    ```
+
+### Configuration
+
+2. Edit a configuration file at `~/.rsii/config.toml`:
     ```toml
     [default]
     model = "your-model" # gpt-4o-mini
