@@ -27,8 +27,8 @@ async fn main() {
         default_user_message
     };
 
-    let home_dir = env::var("HOME").expect("Failed to get home directory");
-    let config_path = format!("{}/rsii_config.toml", home_dir);
+    let home_dir = dirs::home_dir().expect("Failed to get home directory");
+    let config_path = home_dir.join(".rsii/config.toml");
     let config = fs::read_to_string(config_path).expect("Failed to read config file");
     let config: toml::Value = toml::from_str(&config).expect("Failed to parse config file");
 
