@@ -16,9 +16,16 @@ use openai_api_rs::v1::types::JSONSchemaDefine;
 use openai_api_rs::v1::types::JSONSchemaType;
 use serde_json::Value;
 
+include!(concat!(env!("OUT_DIR"), "/version.rs"));
+
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
+
+    if args.len() > 1 && args[1] == "--version" {
+        println!("Version: {}", VERSION);
+        return;
+    }
 
     let default_user_message = String::from("");
     let user_message = if args.len() > 1 {

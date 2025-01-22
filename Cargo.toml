@@ -1,6 +1,6 @@
 [package]
 name = "rsii"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Jakub Kolcar <kolcarjakub@gmail.com>"]
 description = "RSII - Rust AI Command-line Assistant"
@@ -30,6 +30,7 @@ dirs = "6.0.0"
 
 [build-dependencies]
 dirs = "6.0.0"
+toml = "0.8.19"
 
 [[bin]]
 name = "rsii"
