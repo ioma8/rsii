@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
+use std::process::Command;
 
+use clipboard::{ClipboardContext, ClipboardProvider};
 use openai_api_rs::v1::api::OpenAIClient;
 use openai_api_rs::v1::chat_completion;
 use openai_api_rs::v1::chat_completion::ChatCompletionRequest;
@@ -13,7 +15,6 @@ use openai_api_rs::v1::types::FunctionParameters;
 use openai_api_rs::v1::types::JSONSchemaDefine;
 use openai_api_rs::v1::types::JSONSchemaType;
 use serde_json::Value;
-use std::io::{self, Write};
 
 #[tokio::main]
 async fn main() {
@@ -44,7 +45,7 @@ async fn main() {
         .build()
         .expect("Failed to create client");
 
-    let user_arch = std::process::Command::new("uname")
+    let user_arch = Command::new("uname")
         .arg("-a")
         .output()
         .expect("Failed to execute uname command");
@@ -116,46 +117,33 @@ async fn main() {
                         let command_str = command_value["command"]
                             .as_str()
                             .expect("Command not found in arguments");
-                        print!(
-                            "Command to be executed: {}\nPress Enter to execute...",
-                            command_str
-                        );
-                        io::stdout().flush().expect("Failed to flush stdout");
 
-                        let mut input = String::new();
-                        io::stdin()
-                            .read_line(&mut input)
-                            .expect("Failed to read line");
+                        let mut ctx: ClipboardContext =
+                            ClipboardProvider::new().expect("Failed to create clipboard context");
+                        ctx.set_contents(command_str.to_string())
+                            .expect("Failed to set clipboard contents");
 
-                        // TODO: doesnt work
-                        // Add the command to the shell history
-                        let history_file = format!("~/.bash_history");
-                        let history_command =
-                            format!("echo \"{}\" >> {}", command_str, history_file);
-                        std::process::Command::new("sh")
+                        // Run a script to paste clipboard contents after 1 second
+                        let script = r#"
+                        osascript -e 'delay 0.1' -e 'tell application "System Events" to keystroke "v" using command down'
+                        "#;
+                        Command::new("sh")
                             .arg("-c")
-                            .arg(&history_command)
-                            .status()
-                            .expect("Failed to add command to history");
-
-                        // Reload the shell history
-                        std::process::Command::new("sh")
-                            .arg("-c")
-                            .arg("history -r")
-                            .status()
-                            .expect("Failed to reload shell history");
+                            .arg(script)
+                            .spawn()
+                            .expect("Failed to run paste script");
 
                         // Execute the command
-                        let output = std::process::Command::new("sh")
-                            .arg("-c")
-                            .arg(command_str)
-                            .output()
-                            .expect("Failed to execute command");
+                        /* let output = Command::new("sh")
+                        .arg("-c")
+                        .arg(command_str)
+                        .output()
+                        .expect("Failed to execute command"); */
 
-                        println!("{}", String::from_utf8_lossy(&output.stdout));
-                        if !output.stderr.is_empty() {
-                            eprintln!("Command error: {}", String::from_utf8_lossy(&output.stderr));
-                        }
+                        //println!("{}", String::from_utf8_lossy(&output.stdout));
+                        //if !output.stderr.is_empty() {
+                        //    eprintln!("Command error: {}", String::from_utf8_lossy(&output.stderr));
+                        //}
                     }
                 }
             }
