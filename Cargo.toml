@@ -12,6 +12,14 @@ readme = "README.md"
 keywords = ["AI", "OpenAI", "command-line", "assistant", "automation", "productivity", "natural-language-processing"]
 categories = ["command-line-utilities", "artificial-intelligence"]
 
+[package.metadata]
+installation = """
+To install rsii, run the following command:
+```
+cargo install rsii
+```
+"""
+
 [dependencies]
 toml = "0.8.19"
 tokio = { version = "1", features = ["full"] }
