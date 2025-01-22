@@ -22,7 +22,9 @@ async fn main() {
     let default_user_message = String::from("");
     let user_message = args.get(1).unwrap_or(&default_user_message);
 
-    let config = fs::read_to_string("config.toml").expect("Failed to read config file");
+    let home_dir = env::var("HOME").expect("Failed to get home directory");
+    let config_path = format!("{}/rsii_config.toml", home_dir);
+    let config = fs::read_to_string(config_path).expect("Failed to read config file");
     let config: toml::Value = toml::from_str(&config).expect("Failed to parse config file");
 
     let model = config["default"]["model"]
@@ -125,15 +127,23 @@ async fn main() {
                             .read_line(&mut input)
                             .expect("Failed to read line");
 
+                        // TODO: doesnt work
                         // Add the command to the shell history
-                        if let Some(shell) = env::var_os("SHELL") {
-                            let history_command = format!("history -a && \"{}\" && history -r", command_str);
-                            std::process::Command::new(shell)
-                                .arg("-c")
-                                .arg(&history_command)
-                                .status()
-                                .expect("Failed to add command to history and execute");
-                        }
+                        let history_file = format!("~/.bash_history");
+                        let history_command =
+                            format!("echo \"{}\" >> {}", command_str, history_file);
+                        std::process::Command::new("sh")
+                            .arg("-c")
+                            .arg(&history_command)
+                            .status()
+                            .expect("Failed to add command to history");
+
+                        // Reload the shell history
+                        std::process::Command::new("sh")
+                            .arg("-c")
+                            .arg("history -r")
+                            .status()
+                            .expect("Failed to reload shell history");
 
                         // Execute the command
                         let output = std::process::Command::new("sh")
