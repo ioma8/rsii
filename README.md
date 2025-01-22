@@ -1,6 +1,6 @@
-# RSII - Rust AI Command-line Assistant
+# 🌟🚀 Rust Smart Interactive Interface (RSII)
 
-RSII is a Rust-based application that integrates with OpenAI's API to process user queries and execute commands. It leverages the power of AI to provide intelligent responses and automate tasks.
+Ever wanted your terminal to be smarter? RSII uses Rust and OpenAI to turn your queries into system commands. It's like having a clever assistant in your command line.
 
 ## Features
 
@@ -12,30 +12,24 @@ RSII is a Rust-based application that integrates with OpenAI's API to process us
 
 ## Installation
 
-1. Clone the repository:
+1. Ensure Rust is installed on your system. You can download and install Rust from [rust-lang.org](https://www.rust-lang.org/learn/get-started).
+2. Install the RSII package using Cargo:
     ```sh
-    git clone https://github.com/ioma8/rsii.git
-    cd rsii
+    cargo install rsii
     ```
 
-2. Install dependencies:
-    ```sh
-    cargo build
-    ```
-
-3. Create a configuration file `rsii_config.toml` in your home directory with the following content:
+3. Edit a configuration file at `~/.rsii/config.toml`:
     ```toml
     [default]
     model = "your-model" # gpt-4o-mini
     api-key = "your-api-key" # sk-....
-    system-prompt = "your-system-prompt" # copy sample from default.config.toml
     ```
 
 ## Usage
 
 Run the application with a user query:
 ```sh
-cargo run -- "Your query here"
+rsii "Your query here"
 ```
 
 The application will fetch system information, process the query using OpenAI's API, and execute the corresponding command.
