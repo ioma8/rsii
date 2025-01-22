@@ -2,6 +2,15 @@
 name = "rsii"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jakub Kolcar <kolcarjakub@gmail.com>"]
+description = "RSII - Rust AI Command-line Assistant"
+license = "MIT"
+repository = "https://github.com/ioma8/rsii"
+homepage = "https://github.com/ioma8/rsii"
+documentation = "https://github.com/ioma8/rsii"
+readme = "README.md"
+keywords = ["AI", "OpenAI", "command-line", "assistant", "automation", "productivity", "natural-language-processing"]
+categories = ["command-line-utilities", "artificial-intelligence"]
 
 [dependencies]
 toml = "0.8.19"
