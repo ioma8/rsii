@@ -1,4 +1,4 @@
 /target
 config.toml
-*.tar.gz
+/releases
 .DS_Store
