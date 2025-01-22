@@ -9,7 +9,7 @@ repository = "https://github.com/ioma8/rsii"
 homepage = "https://github.com/ioma8/rsii"
 documentation = "https://github.com/ioma8/rsii"
 readme = "README.md"
-keywords = ["AI", "OpenAI", "command-line", "assistant", "automation", "productivity", "natural-language-processing"]
+keywords = ["AI", "OpenAI", "command-line", "assistant", "automation"]
 categories = ["command-line-utilities", "artificial-intelligence"]
 
 [package.metadata]
