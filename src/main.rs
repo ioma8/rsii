@@ -21,7 +21,11 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
 
     let default_user_message = String::from("");
-    let user_message = args.get(1).unwrap_or(&default_user_message);
+    let user_message = if args.len() > 1 {
+        args[1..].join(" ")
+    } else {
+        default_user_message
+    };
 
     let home_dir = env::var("HOME").expect("Failed to get home directory");
     let config_path = format!("{}/rsii_config.toml", home_dir);
@@ -96,10 +100,11 @@ async fn main() {
             },
         },
     }]);
+    println!("Getting AI response...");
     let result = client
         .chat_completion(req)
         .await
-        .expect("Failed to get completion");
+        .expect("Failed to get AI result");
     if let Some(tool_call) = &result.choices[0].message.tool_calls {
         for tool_call in tool_call {
             match tool_call {
@@ -123,27 +128,27 @@ async fn main() {
                         ctx.set_contents(command_str.to_string())
                             .expect("Failed to set clipboard contents");
 
+                        println!("Command is ready");
+
                         // Run a script to paste clipboard contents after 1 second
+                        #[cfg(target_os = "macos")]
                         let script = r#"
-                        osascript -e 'delay 0.1' -e 'tell application "System Events" to keystroke "v" using command down'
+                        osascript -e 'delay 0' -e 'tell application "System Events" to keystroke "v" using command down'
                         "#;
+                        #[cfg(target_os = "linux")]
+                        let script = r#"
+                        xdotool key --delay 1000 ctrl+v
+                        "#;
+                        #[cfg(target_os = "windows")]
+                        let script = r#"
+                        powershell -command "Start-Sleep -Seconds 1; Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('^v')"
+                        "#;
+
                         Command::new("sh")
                             .arg("-c")
                             .arg(script)
                             .spawn()
                             .expect("Failed to run paste script");
-
-                        // Execute the command
-                        /* let output = Command::new("sh")
-                        .arg("-c")
-                        .arg(command_str)
-                        .output()
-                        .expect("Failed to execute command"); */
-
-                        //println!("{}", String::from_utf8_lossy(&output.stdout));
-                        //if !output.stderr.is_empty() {
-                        //    eprintln!("Command error: {}", String::from_utf8_lossy(&output.stderr));
-                        //}
                     }
                 }
             }
