@@ -71,7 +71,7 @@ async fn main() {
     }]);
 
     println!("Getting AI response...");
-    if let Err(e) = handle_ai_response(client, req).await {
+    if let Err(e) = handle_ai_response(&client, req).await {
         eprintln!("AI response error: {}", e);
     }
 }
@@ -106,7 +106,7 @@ fn create_tool_function() -> Function {
 }
 
 async fn handle_ai_response(
-    client: OpenAIClient,
+    client: &OpenAIClient,
     req: ChatCompletionRequest,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let result = client.chat_completion(req).await?;
@@ -156,4 +156,61 @@ fn paste_command() {
         .arg(script)
         .spawn()
         .expect("Failed to run paste script");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tokio;
+    use std::boxed::Box;
+
+    #[test]
+    fn test_get_user_architecture() {
+        match get_user_architecture() {
+            Ok(output) => assert!(!output.is_empty(), "The output should not be empty"),
+            Err(_) => panic!("Failed to get user architecture"),
+        }
+    }
+
+    #[test]
+    fn test_load_config() {
+        match config::load_config() {
+            Ok(config) => {
+                assert!(!config.model.is_empty(), "Model should not be empty");
+                assert!(!config.api_key.is_empty(), "API Key should not be empty");
+                assert!(!config.system_prompt.is_empty(), "System prompt should not be empty");
+            }
+            Err(_) => panic!("Failed to load config"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_handle_ai_response() -> Result<(), Box<dyn std::error::Error>> {
+        let client = OpenAIClient::builder()
+            .with_api_key("dummy_api_key")
+            .build()
+            .expect("Failed to create client");
+
+        let req = ChatCompletionRequest::new(
+            "dummy_model".to_string(),
+            vec![chat_completion::ChatCompletionMessage {
+                role: chat_completion::MessageRole::user,
+                content: chat_completion::Content::Text("test query".to_string()),
+                name: None,
+                tool_call_id: None,
+                tool_calls: None,
+            }],
+        );
+
+        let result = handle_ai_response(&client, req).await;
+        assert!(result.is_err(), "AI Response should fail with dummy API key");
+        Ok(())
+    }
+
+    #[test]
+    fn test_create_tool_function() {
+        let function = create_tool_function();
+        assert_eq!(function.name, "call_command");
+        assert!(function.parameters.properties.is_some(), "Properties should be defined");
+    }
 }
