@@ -36,7 +36,7 @@ async fn main() {
         }
     };
 
-    let client = OpenAIClient::builder()
+    let mut client = OpenAIClient::builder()
         .with_api_key(&config.api_key)
         .build()
         .expect("Failed to create client");
@@ -71,7 +71,7 @@ async fn main() {
     }]);
 
     println!("Getting AI response...");
-    if let Err(e) = handle_ai_response(&client, req).await {
+    if let Err(e) = handle_ai_response(&mut client, req).await {
         eprintln!("AI response error: {}", e);
     }
 }
@@ -106,7 +106,7 @@ fn create_tool_function() -> Function {
 }
 
 async fn handle_ai_response(
-    client: &OpenAIClient,
+    client: &mut OpenAIClient,
     req: ChatCompletionRequest,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let result = client.chat_completion(req).await?;
@@ -186,7 +186,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_handle_ai_response() -> Result<(), Box<dyn std::error::Error>> {
-        let client = OpenAIClient::builder()
+        let mut client = OpenAIClient::builder()
             .with_api_key("dummy_api_key")
             .build()
             .expect("Failed to create client");
@@ -202,7 +202,7 @@ mod tests {
             }],
         );
 
-        let result = handle_ai_response(&client, req).await;
+        let result = handle_ai_response(&mut client, req).await;
         assert!(result.is_err(), "AI Response should fail with dummy API key");
         Ok(())
     }

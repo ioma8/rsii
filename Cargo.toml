@@ -21,16 +21,16 @@ cargo install rsii
 """
 
 [dependencies]
-toml = "0.8.19"
+toml = "0.9"
 tokio = { version = "1", features = ["full"] }
-openai-api-rs = "5.2.4"
+openai-api-rs = "6"
 serde_json = "1.0"
 clipboard = "0.5.0"
 dirs = "6.0.0"
 
 [build-dependencies]
 dirs = "6.0.0"
-toml = "0.8.19"
+toml = "0.9"
 
 [[bin]]
 name = "rsii"
