@@ -25,10 +25,33 @@ struct DefaultSection {
 }
 
 pub fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
-    let home_dir: PathBuf = dirs::home_dir().ok_or("Failed to get home directory")?;
+    let home_dir: PathBuf = dirs::home_dir().ok_or_else(|| {
+        "Failed to determine user home directory".to_string()
+    })?;
     let config_path = home_dir.join(".rsii/config.toml");
-    let config_string = fs::read_to_string(config_path)?;
-    let file_conf: FileConfig = toml::from_str(&config_string)?;
+    if !config_path.exists() {
+        return Err(format!(
+            "Config file not found at {}. Build should have created it.",
+            config_path.display()
+        )
+        .into());
+    }
+
+    let config_string = fs::read_to_string(&config_path).map_err(|e| {
+        format!(
+            "Failed to read config at {}: {}",
+            config_path.display(),
+            e
+        )
+    })?;
+
+    let file_conf: FileConfig = toml::from_str(&config_string).map_err(|e| {
+        format!(
+            "Failed to parse TOML at {}: {}",
+            config_path.display(),
+            e
+        )
+    })?;
 
     Ok(Config {
         model: file_conf.default.model,
