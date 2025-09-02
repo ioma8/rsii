@@ -1089,6 +1089,7 @@ dependencies = [
  "clipboard",
  "dirs",
  "openai-api-rs",
+ "serde",
  "serde_json",
  "tokio",
  "toml",

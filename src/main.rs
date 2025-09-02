@@ -6,7 +6,6 @@ use openai_api_rs::v1::chat_completion;
 use openai_api_rs::v1::chat_completion::ChatCompletionRequest;
 use openai_api_rs::v1::chat_completion::Tool;
 use openai_api_rs::v1::chat_completion::ToolCall;
-use openai_api_rs::v1::chat_completion::ToolCallFunction;
 use openai_api_rs::v1::chat_completion::ToolType;
 use openai_api_rs::v1::types::Function;
 use openai_api_rs::v1::types::FunctionParameters;
@@ -28,6 +27,10 @@ async fn main() {
     }
 
     let user_message = args.get(1..).map_or_else(|| "".to_string(), |msg| msg.join(" "));
+    if user_message.trim().is_empty() {
+        eprintln!("Usage: rsii \"your query here\"");
+        return;
+    }
     let config = match config::load_config() {
         Ok(cfg) => cfg,
         Err(e) => {
@@ -41,7 +44,7 @@ async fn main() {
         .build()
         .expect("Failed to create client");
 
-    let user_arch_str = match get_user_architecture() {
+    let user_arch_str = match system_info() {
         Ok(arch) => arch,
         Err(e) => {
             eprintln!("Error retrieving system info: {}", e);
@@ -49,7 +52,7 @@ async fn main() {
         }
     };
 
-    let total_prompt = format!(
+    let prompt = format!(
         "{} Users system info: {} \n User query:\n{}",
         config.system_prompt, user_arch_str, user_message
     );
@@ -58,7 +61,7 @@ async fn main() {
         config.model.clone(),
         vec![chat_completion::ChatCompletionMessage {
             role: chat_completion::MessageRole::user,
-            content: chat_completion::Content::Text(total_prompt),
+            content: chat_completion::Content::Text(prompt),
             name: None,
             tool_call_id: None,
             tool_calls: None,
@@ -76,7 +79,7 @@ async fn main() {
     }
 }
 
-fn get_user_architecture() -> Result<String, std::io::Error> {
+fn system_info() -> Result<String, std::io::Error> {
     let output: Output = Command::new("uname").arg("-a").output()?;
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
@@ -110,28 +113,25 @@ async fn handle_ai_response(
     req: ChatCompletionRequest,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let result = client.chat_completion(req).await?;
-    if let Some(tool_calls) = &result.choices[0].message.tool_calls {
-        for tool_call in tool_calls {
-            if let ToolCall {
-                id: _,
-                r#type: _,
-                function:
-                    ToolCallFunction {
-                        name: Some(tool_name),
-                        arguments: Some(tool_arguments),
-                    },
-            } = tool_call
-            {
-                if tool_name == "call_command" {
-                    let command_value: Value = serde_json::from_str(tool_arguments)?;
-                    if let Some(command_str) = command_value["command"].as_str() {
-                        let mut ctx: ClipboardContext = ClipboardProvider::new()?;
-                        ctx.set_contents(command_str.to_string())?;
-                        println!("Command is ready");
-                        paste_command();
-                    }
-                }
-            }
+    let Some(tool_calls) = &result.choices[0].message.tool_calls else { return Ok(()); };
+
+    for tc in tool_calls {
+        let ToolCall { function, .. } = tc;
+        if function.name.as_deref() != Some("call_command") {
+            continue;
+        }
+
+        let args = match &function.arguments {
+            Some(a) => a,
+            None => continue,
+        };
+
+        let parsed: Value = serde_json::from_str(args)?;
+        if let Some(cmd) = parsed["command"].as_str() {
+            let mut ctx: ClipboardContext = ClipboardProvider::new()?;
+            ctx.set_contents(cmd.to_string())?;
+            println!("Command copied to clipboard");
+            paste_command();
         }
     }
     Ok(())
@@ -165,23 +165,17 @@ mod tests {
     use std::boxed::Box;
 
     #[test]
-    fn test_get_user_architecture() {
-        match get_user_architecture() {
-            Ok(output) => assert!(!output.is_empty(), "The output should not be empty"),
-            Err(_) => panic!("Failed to get user architecture"),
-        }
+    fn test_system_info() {
+        let output = system_info().expect("Failed to get system info");
+        assert!(!output.is_empty(), "The output should not be empty");
     }
 
     #[test]
     fn test_load_config() {
-        match config::load_config() {
-            Ok(config) => {
-                assert!(!config.model.is_empty(), "Model should not be empty");
-                assert!(!config.api_key.is_empty(), "API Key should not be empty");
-                assert!(!config.system_prompt.is_empty(), "System prompt should not be empty");
-            }
-            Err(_) => panic!("Failed to load config"),
-        }
+        let config = config::load_config().expect("Failed to load config");
+        assert!(!config.model.is_empty(), "Model should not be empty");
+        assert!(!config.api_key.is_empty(), "API Key should not be empty");
+        assert!(!config.system_prompt.is_empty(), "System prompt should not be empty");
     }
 
     #[tokio::test]

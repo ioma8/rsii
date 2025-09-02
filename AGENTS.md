@@ -52,3 +52,110 @@
 - Network access is required at runtime for OpenAI API calls.
 - Keep secrets out of the repo: ensure your personal `~/.rsii/config.toml` contains real credentials.
 
+✅ Checklist for LLM Coding Agent: Low Cognitive Load Code
+
+1. General
+	•	✅ Always write boring, obvious, predictable code.
+	•	❌ Don’t optimize for cleverness, brevity, or novelty.
+
+⸻
+
+2. Conditionals
+	•	✅ Break complex conditions into descriptive intermediate variables.
+	•	✅ Prefer early returns over nested if blocks.
+	•	❌ Don’t write compound conditions with multiple operators inline.
+	•	❌ Don’t deeply nest conditional branches.
+
+⸻
+
+3. Functions / Classes / Modules
+	•	✅ Prefer deep modules: powerful implementation hidden behind a simple interface.
+	•	✅ Keep module boundaries clear and intuitive.
+	•	❌ Don’t create many tiny, shallow modules that require lots of cross-referencing.
+	•	❌ Don’t fragment functionality across dozens of small classes or files.
+
+⸻
+
+4. Inheritance & Composition
+	•	✅ Use composition for reuse.
+	•	❌ Don’t create long inheritance chains.
+	•	❌ Don’t bury logic across multiple superclasses.
+
+⸻
+
+5. Services / Architecture
+	•	✅ Default to a modular monolith.
+	•	✅ Only introduce microservices when independent deployment is necessary.
+	•	❌ Don’t split into many microservices prematurely.
+	•	❌ Don’t design based on “trendy architectures” without practical justification.
+
+⸻
+
+6. Responsibility
+	•	✅ Define responsibility in terms of a single stakeholder or user group.
+	•	❌ Don’t split modules by arbitrary “one thing” definitions.
+	•	❌ Don’t design abstractions that serve no clear stakeholder.
+
+⸻
+
+7. DRY (Don’t Repeat Yourself)
+	•	✅ Allow small, local duplication if it keeps code simpler.
+	•	✅ Prefer explicit, self-contained code over abstract coupling.
+	•	❌ Don’t over-abstract shared code prematurely.
+	•	❌ Don’t pull in heavy libraries for trivial helpers.
+
+⸻
+
+8. Dependencies & Frameworks
+	•	✅ Treat dependencies as if you must debug them yourself.
+	•	✅ Keep business logic independent of frameworks.
+	•	❌ Don’t couple your code tightly to framework “magic.”
+	•	❌ Don’t introduce dependencies unless the payoff is clear.
+
+⸻
+
+9. Abstractions
+	•	✅ Add abstractions only when a real, current extension point exists.
+	•	✅ Use dependency inversion and information hiding.
+	•	❌ Don’t add unnecessary architecture layers (Hexagonal, Onion, etc.) for fashion.
+	•	❌ Don’t multiply indirections without reason.
+
+⸻
+
+10. Naming & Communication
+	•	✅ Use descriptive names and self-descriptive codes.
+	•	✅ Prefer clear human terms (e.g., “login” / “permissions”).
+	•	❌ Don’t force developers to memorize numeric mappings (e.g., HTTP 401/403 distinctions for business logic).
+	•	❌ Don’t use jargon where simpler terms exist.
+
+⸻
+
+11. Language & Features
+	•	✅ Stick to simple, idiomatic features.
+	•	✅ Use the smallest expressive subset of the language.
+	•	❌ Don’t overuse advanced or obscure language features.
+	•	❌ Don’t introduce multiple ways to do the same thing.
+
+⸻
+
+12. Mental Models & Team Onboarding
+	•	✅ Optimize for newcomers: code should be graspable in hours, not weeks.
+	•	✅ Favor linear, obvious reading flow.
+	•	❌ Don’t rely on “familiarity” — familiar ≠ simple.
+	•	❌ Don’t use clever hacks or non-idiomatic tricks.
+
+⸻
+
+13. Defaults to Prefer
+	•	✅ CRUD-style architecture.
+	•	✅ Monolith with modular boundaries.
+	•	✅ Clear entry-point “wiring” functions.
+	•	✅ Self-contained deep modules.
+
+⸻
+
+👉 Use this checklist every time you generate code.
+If a rule conflicts with another, choose the option that reduces cognitive load the most.
+
+⸻
+
